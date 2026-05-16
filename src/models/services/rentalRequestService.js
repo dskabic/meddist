@@ -78,10 +78,24 @@ async function createRentalRequest(formData, clientId) {
       throw error;
     }
 
-    if (device.availability_status !== "Dostupan") {
+    if (["Na servisu", "Nedostupan"].includes(device.availability_status)) {
       const error = new Error("Uređaj nije dostupan.");
       error.validationErrors = [
         `Uređaj ${device.name} (${device.serial_number}) nije dostupan za najam.`
+      ];
+      throw error;
+    }
+
+    const isAvailableForPeriod = await rentalRequestRepository.isDeviceAvailableForPeriod(
+      item.equipmentId,
+      rentalRequest.desiredStartDate,
+      rentalRequest.desiredReturnDate
+    );
+
+    if (!isAvailableForPeriod) {
+      const error = new Error("Uređaj je već rezerviran u odabranom terminu.");
+      error.validationErrors = [
+        `Uređaj ${device.name} (${device.serial_number}) već je rezerviran u periodu od ${rentalRequest.desiredStartDate} do ${rentalRequest.desiredReturnDate}.`
       ];
       throw error;
     }

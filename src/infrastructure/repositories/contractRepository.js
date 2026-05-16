@@ -86,14 +86,6 @@ async function createFromContractForm(requestId, workerId, formData) {
         ]
       );
 
-      await client.query(
-        `
-        UPDATE Uredaj
-        SET Status_Raspolozivosti = 'Iznajmljen'
-        WHERE ID_Artikla = $1
-        `,
-        [item.equipmentId]
-      );
     }
 
     await client.query(

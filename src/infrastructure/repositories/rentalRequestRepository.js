@@ -13,7 +13,7 @@ async function findAvailableDevices() {
     FROM Uredaj u
     JOIN Artikl a ON u.ID_Artikla = a.ID_Artikla
     WHERE a.Aktivan = TRUE
-      AND u.Status_Raspolozivosti = 'Dostupan'
+      AND u.Status_Raspolozivosti NOT IN ('Na servisu', 'Nedostupan')
     ORDER BY a.Naziv_Artikla
     `
   );
@@ -39,6 +39,23 @@ async function findDeviceById(id) {
   );
 
   return result.rows[0] || null;
+}
+
+async function isDeviceAvailableForPeriod(deviceId, desiredStartDate, desiredReturnDate) {
+  const result = await pool.query(
+    `
+    SELECT COUNT(*) AS overlap_count
+    FROM Stavka_ugovora su
+    JOIN Ugovor_o_najmu u
+      ON su.ID_Ugovora = u.ID_Ugovora
+    WHERE su.ID_Artikla = $1
+      AND u.Datum_Pocetka_Najma <= $3
+      AND u.Ocekivani_Povrat >= $2
+    `,
+    [deviceId, desiredStartDate, desiredReturnDate]
+  );
+
+  return Number(result.rows[0].overlap_count) === 0;
 }
 
 async function create(rentalRequest) {
@@ -181,6 +198,7 @@ async function findById(id) {
 module.exports = {
   findAvailableDevices,
   findDeviceById,
+  isDeviceAvailableForPeriod,
   create,
   findByClientId,
   findById
