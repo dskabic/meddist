@@ -13,7 +13,11 @@ async function findAll(search = "") {
       a.Proizvodac AS manufacturer,
 
       u.Serijski_Broj AS serial_number,
-      u.Status_Raspolozivosti AS availability_status
+      u.Status_Raspolozivosti AS availability_status,
+      CASE
+        WHEN u.Status_Raspolozivosti = 'Na servisu' THEN 'U tijeku'
+        ELSE 'Završen'
+      END AS service_status
 
     FROM Servis s
     JOIN Uredaj u ON s.ID_Artikla = u.ID_Artikla
@@ -46,7 +50,11 @@ async function findById(id) {
       a.Proizvodac AS manufacturer,
 
       u.Serijski_Broj AS serial_number,
-      u.Status_Raspolozivosti AS availability_status
+      u.Status_Raspolozivosti AS availability_status,
+      CASE
+        WHEN u.Status_Raspolozivosti = 'Na servisu' THEN 'U tijeku'
+        ELSE 'Završen'
+      END AS service_status
 
     FROM Servis s
     JOIN Uredaj u ON s.ID_Artikla = u.ID_Artikla
@@ -60,7 +68,7 @@ async function findById(id) {
   return result.rows[0] || null;
 }
 
-async function findAvailableDevices() {
+async function findAvailableDevices(currentEquipmentId = null) {
   const result = await pool.query(
     `
     SELECT
@@ -74,9 +82,12 @@ async function findAvailableDevices() {
     JOIN Artikl a ON u.ID_Artikla = a.ID_Artikla
 
     WHERE a.Aktivan = TRUE
+      OR u.ID_Artikla = $1
 
     ORDER BY a.Naziv_Artikla
     `
+    ,
+    [currentEquipmentId]
   );
 
   return result.rows;

@@ -52,9 +52,11 @@ async function findById(id) {
 
       u.Serijski_Broj AS serial_number,
       u.Status_Raspolozivosti AS availability_status,
+      u.Zadana_Cijena_Po_Danu AS default_rental_price_per_day,
 
       pm.LOT_Broj AS lot_number,
       pm.Trenutna_Zaliha AS current_stock,
+      pm.Zadana_Jedinicna_Cijena AS default_unit_price,
 
       CASE
         WHEN u.ID_Artikla IS NOT NULL THEN 'UREDAJ'

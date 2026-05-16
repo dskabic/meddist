@@ -25,8 +25,8 @@ async function getServiceById(id) {
   return service;
 }
 
-async function getDevicesForDropdown() {
-  return serviceRepository.findAvailableDevices();
+async function getDevicesForDropdown(currentEquipmentId = null) {
+  return serviceRepository.findAvailableDevices(currentEquipmentId);
 }
 
 async function createServiceRecord(formData) {

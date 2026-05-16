@@ -50,7 +50,7 @@ async function create(req, res) {
 async function editForm(req, res) {
   try {
     const service = await serviceService.getServiceById(req.params.id);
-    const devices = await serviceService.getDevicesForDropdown();
+    const devices = await serviceService.getDevicesForDropdown(service.equipment_id);
 
     res.render("services/edit", {
       errors: [],
@@ -67,7 +67,7 @@ async function update(req, res) {
     await serviceService.updateServiceRecord(req.params.id, req.body);
     res.redirect("/worker/service/records");
   } catch (error) {
-    const devices = await serviceService.getDevicesForDropdown();
+    const devices = await serviceService.getDevicesForDropdown(req.body.equipmentId);
 
     const service = {
       id: req.params.id,

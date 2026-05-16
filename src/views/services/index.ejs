@@ -36,6 +36,7 @@
             <th class="px-5 py-4 font-semibold">Uređaj</th>
             <th class="px-5 py-4 font-semibold">Proizvođač</th>
             <th class="px-5 py-4 font-semibold">Serijski broj</th>
+            <th class="px-5 py-4 font-semibold">Status servisa</th>
             <th class="px-5 py-4 font-semibold">Status uređaja</th>
             <th class="px-5 py-4 font-semibold">Opis radova</th>
             <th class="px-5 py-4 font-semibold">Akcije</th>
@@ -56,15 +57,24 @@
               <td class="px-5 py-4 font-medium text-white"><%= service.equipment_name %></td>
               <td class="px-5 py-4 text-slate-300"><%= service.manufacturer || "-" %></td>
               <td class="px-5 py-4 text-slate-300"><%= service.serial_number %></td>
+              <td class="px-5 py-4">
+                <% if (service.service_status === "U tijeku") { %>
+                  <span class="inline-flex items-center rounded-full border border-amber-400/20 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-200">U tijeku</span>
+                <% } else { %>
+                  <span class="inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200">Završen</span>
+                <% } %>
+              </td>
               <td class="px-5 py-4 text-slate-300"><%= service.availability_status %></td>
               <td class="px-5 py-4 text-slate-300"><%= service.description %></td>
               <td class="px-5 py-4">
                 <div class="flex flex-wrap gap-2">
                   <a href="/worker/service/records/<%= service.id %>/edit" class="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10">Uredi</a>
 
-                  <form method="POST" action="/worker/service/records/<%= service.id %>/finish">
-                    <button type="submit" class="inline-flex items-center justify-center rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-500/20">Završi servis</button>
-                  </form>
+                  <% if (service.service_status === "U tijeku") { %>
+                    <form method="POST" action="/worker/service/records/<%= service.id %>/finish">
+                      <button type="submit" class="inline-flex items-center justify-center rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-500/20">Dovrši servis</button>
+                    </form>
+                  <% } %>
 
                   <form method="POST" action="/worker/service/records/<%= service.id %>/delete" onsubmit="return confirm('Jeste li sigurni da želite obrisati servis?');">
                     <button type="submit" class="inline-flex items-center justify-center rounded-lg border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-500/20">Obriši</button>

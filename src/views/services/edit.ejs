@@ -23,13 +23,14 @@
     <% } %>
 
     <form method="POST" action="/worker/service/records/<%= service.id %>/edit" class="mt-8 space-y-6">
+      <% const selectedEquipmentId = service.equipment_id ?? service.equipmentId ?? service.equipmentID; %>
       <div>
         <label class="mb-2 block text-sm font-medium text-slate-200">Uređaj</label>
         <select name="equipmentId" class="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
           <option value="">-- Odaberite uređaj --</option>
 
           <% devices.forEach(device => { %>
-            <option value="<%= device.id %>" <%= Number(service.equipment_id) === Number(device.id) ? "selected" : "" %>>
+            <option value="<%= device.id %>" <%= Number(selectedEquipmentId) === Number(device.id) ? "selected" : "" %>>
               <%= device.name %> - <%= device.serial_number %> - <%= device.availability_status %>
             </option>
           <% }) %>
