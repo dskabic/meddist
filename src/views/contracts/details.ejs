@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Detalji ugovora</title>
+</head>
+<body>
+  <h1>Detalji ugovora #<%= contract.id %></h1>
+
+  <p>
+    <a href="/worker/orders/contracts">Natrag na popis ugovora</a>
+  </p>
+
+  <h3>Zaglavlje ugovora</h3>
+
+  <table border="1" cellpadding="6">
+    <tr>
+      <th>Klijent</th>
+      <td><%= contract.client_name %></td>
+    </tr>
+    <tr>
+      <th>OIB</th>
+      <td><%= contract.client_oib %></td>
+    </tr>
+    <tr>
+      <th>Adresa</th>
+      <td>
+        <%= contract.client_street || "-" %>,
+        <%= contract.client_postal_code || "" %>
+        <%= contract.client_city || "" %>
+      </td>
+    </tr>
+    <tr>
+      <th>Email klijenta</th>
+      <td><%= contract.client_email %></td>
+    </tr>
+    <tr>
+      <th>Djelatnik</th>
+      <td><%= contract.worker_name %> (<%= contract.worker_role %>)</td>
+    </tr>
+    <tr>
+      <th>Email djelatnika</th>
+      <td><%= contract.worker_email %></td>
+    </tr>
+    <tr>
+      <th>Datum sklapanja</th>
+      <td><%= new Date(contract.contract_date).toLocaleDateString("hr-HR") %></td>
+    </tr>
+    <tr>
+      <th>Početak najma</th>
+      <td>
+        <%= contract.rental_start_date ? new Date(contract.rental_start_date).toLocaleDateString("hr-HR") : "-" %>
+      </td>
+    </tr>
+    <tr>
+      <th>Očekivani povrat</th>
+      <td><%= new Date(contract.expected_return_date).toLocaleDateString("hr-HR") %></td>
+    </tr>
+    <tr>
+      <th>Status</th>
+      <td><%= contract.status %></td>
+    </tr>
+    <tr>
+      <th>ID zahtjeva</th>
+      <td><%= contract.request_id %></td>
+    </tr>
+  </table>
+
+  <h3>Stavke ugovora</h3>
+
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>Uređaj</th>
+        <th>Proizvođač</th>
+        <th>Serijski broj</th>
+        <th>Status uređaja</th>
+        <th>Ugovorena cijena po danu</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% if (contract.items.length === 0) { %>
+        <tr>
+          <td colspan="5">Ugovor nema stavki.</td>
+        </tr>
+      <% } %>
+
+      <% contract.items.forEach(item => { %>
+        <tr>
+          <td><%= item.equipment_name %></td>
+          <td><%= item.manufacturer || "-" %></td>
+          <td><%= item.serial_number %></td>
+          <td><%= item.availability_status %></td>
+          <td><%= item.agreed_price_per_day %> €</td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <br>
+
+  <%
+    const start = contract.rental_start_date ? new Date(contract.rental_start_date) : null;
+    const end = new Date(contract.expected_return_date);
+    let days = null;
+
+    if (start) {
+      days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    }
+
+    const dailyTotal = contract.items.reduce((sum, item) => {
+      return sum + Number(item.agreed_price_per_day);
+    }, 0);
+  %>
+
+  <h3>Izračun</h3>
+
+  <table border="1" cellpadding="6">
+    <tr>
+      <th>Dnevni ukupni iznos</th>
+      <td><%= dailyTotal.toFixed(2) %> €</td>
+    </tr>
+
+    <tr>
+      <th>Broj dana</th>
+      <td><%= days !== null ? days : "-" %></td>
+    </tr>
+
+    <tr>
+      <th>Ukupno procijenjeno</th>
+      <td>
+        <%= days !== null ? (dailyTotal * days).toFixed(2) + " €" : "-" %>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

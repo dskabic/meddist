@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Popis ugovora o najmu</title>
+</head>
+<body>
+  <h1>Popis ugovora o najmu</h1>
+
+  <p>
+    <a href="/worker/orders">Natrag na dashboard</a>
+  </p>
+
+  <form method="GET" action="/worker/orders/contracts">
+    <input
+      type="text"
+      name="search"
+      placeholder="Pretraži po klijentu, OIB-u, djelatniku ili statusu"
+      value="<%= search %>"
+    >
+    <button type="submit">Pretraži</button>
+    <a href="/worker/orders/contracts">Očisti</a>
+  </form>
+
+  <br>
+
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Klijent</th>
+        <th>OIB</th>
+        <th>Datum sklapanja</th>
+        <th>Početak najma</th>
+        <th>Očekivani povrat</th>
+        <th>Status</th>
+        <th>Broj stavki</th>
+        <th>Dnevni iznos</th>
+        <th>Akcija</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% if (contracts.length === 0) { %>
+        <tr>
+          <td colspan="10">Nema ugovora.</td>
+        </tr>
+      <% } %>
+
+      <% contracts.forEach(contract => { %>
+        <tr>
+          <td><%= contract.id %></td>
+          <td><%= contract.client_name %></td>
+          <td><%= contract.client_oib %></td>
+          <td><%= new Date(contract.contract_date).toLocaleDateString("hr-HR") %></td>
+          <td>
+            <%= contract.rental_start_date ? new Date(contract.rental_start_date).toLocaleDateString("hr-HR") : "-" %>
+          </td>
+          <td><%= new Date(contract.expected_return_date).toLocaleDateString("hr-HR") %></td>
+          <td><%= contract.status %></td>
+          <td><%= contract.item_count %></td>
+          <td><%= contract.daily_total %> €</td>
+          <td>
+            <a href="/worker/orders/contracts/<%= contract.id %>">
+              <button>Detalji</button>
+            </a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>
