@@ -205,8 +205,22 @@ CREATE TABLE Ugovor_o_najmu (
     Ocekivani_Povrat DATE NOT NULL,
     Status VARCHAR(50) NOT NULL DEFAULT 'Na čekanju potvrde korisnika',
 
+    ID_Korisnika INT NOT NULL,
+    ID_Djelatnika INT NOT NULL,
+    ID_Zahtjeva INT NOT NULL UNIQUE,
+
     CONSTRAINT chk_ugovor_datumi
     CHECK (Ocekivani_Povrat > Datum_Pocetka_Najma),
+
+    FOREIGN KEY (ID_Korisnika)
+    REFERENCES Korisnik(ID_Korisnika),
+
+    FOREIGN KEY (ID_Djelatnika)
+    REFERENCES Djelatnik(ID_Djelatnika),
+
+    FOREIGN KEY (ID_Zahtjeva)
+    REFERENCES Zahtjev_za_najam(ID_Zahtjeva)
+);
 
 
 -- ============================================================
@@ -417,5 +431,3 @@ ON Narudzba_za_kupnju(ID_Korisnika);
 
 CREATE INDEX idx_servis_uredaj
 ON Servis(ID_Artikla);
-
-

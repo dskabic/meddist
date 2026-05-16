@@ -54,6 +54,46 @@ async function createContractFromRequest(requestId, workerId, formData) {
     throw error;
   }
 
+  const equipmentIds = Array.isArray(formData.equipmentId)
+    ? formData.equipmentId
+    : [formData.equipmentId];
+
+  for (const equipmentId of equipmentIds) {
+    if (!equipmentId) {
+      continue;
+    }
+
+    const device = await workerRentalRequestRepository.findDeviceById(Number(equipmentId));
+
+    if (!device) {
+      const error = new Error("Odabrani uređaj ne postoji.");
+      error.validationErrors = ["Odabrani uređaj ne postoji."];
+      throw error;
+    }
+
+    if (["Na servisu", "Nedostupan"].includes(device.availability_status)) {
+      const error = new Error("Uređaj nije dostupan za ugovor.");
+      error.validationErrors = [
+        `Uređaj ${device.name} (${device.serial_number}) nije dostupan za najam.`
+      ];
+      throw error;
+    }
+
+    const isAvailableForPeriod = await workerRentalRequestRepository.isDeviceAvailableForPeriod(
+      Number(equipmentId),
+      formData.rentalStartDate,
+      formData.expectedReturnDate
+    );
+
+    if (!isAvailableForPeriod) {
+      const error = new Error("Uređaj je već rezerviran u odabranom terminu.");
+      error.validationErrors = [
+        `Uređaj ${device.name} (${device.serial_number}) već je rezerviran u periodu od ${formData.rentalStartDate} do ${formData.expectedReturnDate}.`
+      ];
+      throw error;
+    }
+  }
+
   return contractRepository.createFromContractForm(
     requestId,
     workerId,
