@@ -30,17 +30,13 @@ function validateRentalRequest(rentalRequest) {
       continue;
     }
 
-    if (selectedDeviceIds.has(Number(item.equipmentId))) {
+    const equipmentId = Number(item.equipmentId);
+
+    if (selectedDeviceIds.has(equipmentId)) {
       errors.push("Isti uređaj ne može biti dodan više puta u isti zahtjev.");
     }
 
-    selectedDeviceIds.add(Number(item.equipmentId));
-
-    const price = Number(item.pricePerDay);
-
-    if (!Number.isFinite(price) || price <= 0) {
-      errors.push("Cijena po danu mora biti veća od 0.");
-    }
+    selectedDeviceIds.add(equipmentId);
   }
 
   return {

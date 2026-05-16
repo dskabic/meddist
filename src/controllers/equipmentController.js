@@ -24,7 +24,9 @@ function createForm(req, res) {
       serialNumber: "",
       availabilityStatus: "Dostupan",
       lotNumber: "",
-      currentStock: ""
+      currentStock: "",
+      defaultRentalPricePerDay: "",
+      defaultUnitPrice: ""
     }
   });
 }
@@ -67,7 +69,9 @@ async function update(req, res) {
       serial_number: req.body.serialNumber,
       availability_status: req.body.availabilityStatus,
       lot_number: req.body.lotNumber,
-      current_stock: req.body.currentStock
+      current_stock: req.body.currentStock,
+      default_rental_price_per_day: req.body.defaultRentalPricePerDay,
+      default_unit_price: req.body.defaultUnitPrice
     };
 
     res.render("equipment/edit", {

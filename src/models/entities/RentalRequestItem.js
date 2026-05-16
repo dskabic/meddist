@@ -1,12 +1,10 @@
 class RentalRequestItem {
   constructor({
     requestId = null,
-    equipmentId,
-    pricePerDay
+    equipmentId
   }) {
     this.requestId = requestId;
     this.equipmentId = equipmentId;
-    this.pricePerDay = pricePerDay;
   }
 }
 

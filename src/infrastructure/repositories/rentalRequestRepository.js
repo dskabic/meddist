@@ -8,7 +8,8 @@ async function findAvailableDevices() {
       a.Naziv_Artikla AS name,
       a.Proizvodac AS manufacturer,
       u.Serijski_Broj AS serial_number,
-      u.Status_Raspolozivosti AS availability_status
+      u.Status_Raspolozivosti AS availability_status,
+      u.Zadana_Cijena_Po_Danu AS default_rental_price_per_day
     FROM Uredaj u
     JOIN Artikl a ON u.ID_Artikla = a.ID_Artikla
     WHERE a.Aktivan = TRUE
@@ -28,7 +29,8 @@ async function findDeviceById(id) {
       a.Naziv_Artikla AS name,
       a.Proizvodac AS manufacturer,
       u.Serijski_Broj AS serial_number,
-      u.Status_Raspolozivosti AS availability_status
+      u.Status_Raspolozivosti AS availability_status,
+      u.Zadana_Cijena_Po_Danu AS default_rental_price_per_day
     FROM Uredaj u
     JOIN Artikl a ON u.ID_Artikla = a.ID_Artikla
     WHERE u.ID_Artikla = $1
@@ -84,16 +86,11 @@ async function create(rentalRequest) {
         INSERT INTO Stavka_zahtjeva_najma
         (
           ID_Zahtjeva,
-          ID_Artikla,
-          Cijena_Po_Danu
+          ID_Artikla
         )
-        VALUES ($1, $2, $3)
+        VALUES ($1, $2)
         `,
-        [
-          requestId,
-          item.equipmentId,
-          item.pricePerDay
-        ]
+        [requestId, item.equipmentId]
       );
     }
 
@@ -162,11 +159,11 @@ async function findById(id) {
     SELECT
       s.ID_Zahtjeva AS request_id,
       s.ID_Artikla AS equipment_id,
-      s.Cijena_Po_Danu AS price_per_day,
       a.Naziv_Artikla AS equipment_name,
       a.Proizvodac AS manufacturer,
       u.Serijski_Broj AS serial_number,
-      u.Status_Raspolozivosti AS availability_status
+      u.Status_Raspolozivosti AS availability_status,
+      u.Zadana_Cijena_Po_Danu AS default_rental_price_per_day
     FROM Stavka_zahtjeva_najma s
     JOIN Uredaj u ON s.ID_Artikla = u.ID_Artikla
     JOIN Artikl a ON u.ID_Artikla = a.ID_Artikla

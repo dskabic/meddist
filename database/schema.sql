@@ -244,6 +244,34 @@ CREATE TABLE Racun (
     FOREIGN KEY (ID_Narudzbe)
     REFERENCES Narudzba_za_kupnju(ID_Narudzbe)
 );
+DROP TABLE IF EXISTS Stavka_zahtjeva_najma CASCADE;
+
+CREATE TABLE Stavka_zahtjeva_najma (
+    ID_Zahtjeva INT NOT NULL,
+    ID_Artikla INT NOT NULL,
+
+    PRIMARY KEY (ID_Zahtjeva, ID_Artikla),
+
+    FOREIGN KEY (ID_Zahtjeva)
+    REFERENCES Zahtjev_za_najam(ID_Zahtjeva)
+    ON DELETE CASCADE,
+
+    FOREIGN KEY (ID_Artikla)
+    REFERENCES Uredaj(ID_Artikla)
+);
+ALTER TABLE Ugovor_o_najmu
+ADD COLUMN IF NOT EXISTS Status VARCHAR(50) NOT NULL DEFAULT 'Na čekanju potvrde korisnika';
+
+ALTER TABLE Ugovor_o_najmu
+DROP CONSTRAINT IF EXISTS chk_status_ugovora;
+
+ALTER TABLE Ugovor_o_najmu
+ADD CONSTRAINT chk_status_ugovora
+CHECK (Status IN (
+    'Na čekanju potvrde korisnika',
+    'Potvrđen',
+    'Poništen'
+));
 
 CREATE INDEX idx_korisnik_email ON Korisnik(Email);
 CREATE INDEX idx_djelatnik_email ON Djelatnik(Email);

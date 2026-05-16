@@ -11,9 +11,11 @@ async function findAll(search = "") {
 
       u.Serijski_Broj AS serial_number,
       u.Status_Raspolozivosti AS availability_status,
+      u.Zadana_Cijena_Po_Danu AS default_rental_price_per_day,
 
       pm.LOT_Broj AS lot_number,
       pm.Trenutna_Zaliha AS current_stock,
+      pm.Zadana_Jedinicna_Cijena AS default_unit_price,
 
       CASE
         WHEN u.ID_Artikla IS NOT NULL THEN 'UREDAJ'
@@ -90,32 +92,34 @@ async function create(equipment) {
 
     if (equipment.type === "UREDAJ") {
       await client.query(
-        `
-        INSERT INTO Uredaj
-        (ID_Artikla, Serijski_Broj, Status_Raspolozivosti)
-        VALUES ($1, $2, $3)
-        `,
-        [
-          articleId,
-          equipment.serialNumber,
-          equipment.availabilityStatus || "Dostupan"
-        ]
-      );
+      `
+      INSERT INTO Uredaj
+     (ID_Artikla, Serijski_Broj, Status_Raspolozivosti, Zadana_Cijena_Po_Danu)
+      VALUES ($1, $2, $3, $4)
+    `,
+   [
+     articleId,
+     equipment.serialNumber,
+     equipment.availabilityStatus || "Dostupan",
+     equipment.defaultRentalPricePerDay
+   ]
+);
     }
 
     if (equipment.type === "POTROSNI_MATERIJAL") {
       await client.query(
-        `
-        INSERT INTO Potrosni_materijal
-        (ID_Artikla, LOT_Broj, Trenutna_Zaliha)
-        VALUES ($1, $2, $3)
-        `,
-        [
-          articleId,
-          equipment.lotNumber,
-          Number(equipment.currentStock)
-        ]
-      );
+      `
+      INSERT INTO Potrosni_materijal
+      (ID_Artikla, LOT_Broj, Trenutna_Zaliha, Zadana_Jedinicna_Cijena)
+      VALUES ($1, $2, $3, $4)
+     `,
+   [
+      articleId,
+      equipment.lotNumber,
+      Number(equipment.currentStock),
+     equipment.defaultUnitPrice
+   ]
+);
     }
 
     await client.query("COMMIT");
@@ -159,13 +163,14 @@ async function update(id, equipment) {
         await client.query(
           `
           INSERT INTO Uredaj
-          (ID_Artikla, Serijski_Broj, Status_Raspolozivosti)
-          VALUES ($1, $2, $3)
+          (ID_Artikla, Serijski_Broj, Status_Raspolozivosti, Zadana_Cijena_Po_Danu)
+          VALUES ($1, $2, $3, $4)
           `,
           [
             id,
             equipment.serialNumber,
-            equipment.availabilityStatus || "Dostupan"
+            equipment.availabilityStatus || "Dostupan",
+            equipment.defaultRentalPricePerDay
           ]
         );
       }
@@ -174,47 +179,52 @@ async function update(id, equipment) {
         await client.query(
           `
           INSERT INTO Potrosni_materijal
-          (ID_Artikla, LOT_Broj, Trenutna_Zaliha)
-          VALUES ($1, $2, $3)
+          (ID_Artikla, LOT_Broj, Trenutna_Zaliha, Zadana_Jedinicna_Cijena)
+          VALUES ($1, $2, $3, $4)
           `,
           [
             id,
             equipment.lotNumber,
-            Number(equipment.currentStock)
+            Number(equipment.currentStock),
+            equipment.defaultUnitPrice
           ]
         );
       }
     } else {
       if (equipment.type === "UREDAJ") {
         await client.query(
-          `
-          UPDATE Uredaj
-          SET Serijski_Broj = $1,
-              Status_Raspolozivosti = $2
-          WHERE ID_Artikla = $3
-          `,
-          [
-            equipment.serialNumber,
-            equipment.availabilityStatus || "Dostupan",
-            id
-          ]
-        );
+  `
+  UPDATE Uredaj
+  SET Serijski_Broj = $1,
+      Status_Raspolozivosti = $2,
+      Zadana_Cijena_Po_Danu = $3
+  WHERE ID_Artikla = $4
+  `,
+  [
+    equipment.serialNumber,
+    equipment.availabilityStatus || "Dostupan",
+    equipment.defaultRentalPricePerDay,
+    id
+  ]
+);
       }
 
       if (equipment.type === "POTROSNI_MATERIJAL") {
         await client.query(
-          `
-          UPDATE Potrosni_materijal
-          SET LOT_Broj = $1,
-              Trenutna_Zaliha = $2
-          WHERE ID_Artikla = $3
-          `,
-          [
-            equipment.lotNumber,
-            Number(equipment.currentStock),
-            id
-          ]
-        );
+  `
+  UPDATE Potrosni_materijal
+  SET LOT_Broj = $1,
+      Trenutna_Zaliha = $2,
+      Zadana_Jedinicna_Cijena = $3
+  WHERE ID_Artikla = $4
+  `,
+  [
+    equipment.lotNumber,
+    Number(equipment.currentStock),
+    equipment.defaultUnitPrice,
+    id
+  ]
+);
       }
     }
 

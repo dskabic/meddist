@@ -1,83 +1,137 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Novi zahtjev za najam</title>
-</head>
-<body>
-  <h1>Novi zahtjev za najam</h1>
+<%- include("../partials/page-start", { pageTitle: "Novi zahtjev za najam" }) %>
 
-  <p>
-    <a href="/client/rental-requests">Natrag na popis</a>
-  </p>
+<main class="mx-auto max-w-4xl">
+  <section class="rounded-3xl border border-white/10 bg-white/8 p-8 shadow-2xl shadow-slate-950/40 backdrop-blur-xl sm:p-10">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <p class="text-sm font-medium uppercase tracking-[0.24em] text-cyan-200">Klijent</p>
+        <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white">Novi zahtjev za najam</h1>
+        <p class="mt-3 text-sm leading-6 text-slate-300">Odaberite datume i dodajte uređaje koje želite uključiti u zahtjev.</p>
+      </div>
 
-  <% if (errors && errors.length > 0) { %>
-    <div style="color: red;">
-      <ul>
-        <% errors.forEach(error => { %>
-          <li><%= error %></li>
-        <% }) %>
-      </ul>
-    </div>
-  <% } %>
-
-  <form method="POST" action="/client/rental-requests/create">
-    <h3>Zaglavlje zahtjeva</h3>
-
-    <div>
-      <label>Željeni datum početka najma:</label>
-      <input
-        type="date"
-        name="desiredStartDate"
-        value="<%= formData.desiredStartDate || '' %>"
-      >
+      <a href="/client/rental-requests" class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Natrag na popis</a>
     </div>
 
-    <div>
-      <label>Željeni datum povrata:</label>
-      <input
-        type="date"
-        name="desiredReturnDate"
-        value="<%= formData.desiredReturnDate || '' %>"
-      >
-    </div>
+    <% if (errors && errors.length > 0) { %>
+      <div class="mt-6 rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-4 text-sm text-rose-200">
+        <ul class="list-disc space-y-1 pl-5">
+          <% errors.forEach(error => { %>
+            <li><%= error %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
 
-    <hr>
+    <form method="POST" action="/client/rental-requests/create" class="mt-8 space-y-8">
+      <section class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+        <h2 class="text-lg font-semibold text-white">Zaglavlje zahtjeva</h2>
 
-    <h3>Stavke zahtjeva</h3>
+        <div class="mt-5 grid gap-5 md:grid-cols-2">
+          <div>
+            <label class="mb-2 block text-sm font-medium text-slate-200">Željeni datum početka najma</label>
+            <input type="date" name="desiredStartDate" value="<%= formData.desiredStartDate || '' %>" class="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
+          </div>
 
-    <p>Za početak su dostupne 3 stavke. Prazne stavke se ignoriraju.</p>
+          <div>
+            <label class="mb-2 block text-sm font-medium text-slate-200">Željeni datum povrata</label>
+            <input type="date" name="desiredReturnDate" value="<%= formData.desiredReturnDate || '' %>" class="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
+          </div>
+        </div>
+      </section>
 
-    <% for (let i = 0; i < 3; i++) { %>
-      <fieldset>
-        <legend>Stavka <%= i + 1 %></legend>
+      <section class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-white">Odabrani uređaji</h2>
+            <p class="mt-1 text-sm leading-6 text-slate-300">Odaberite uređaj. Nakon odabira automatski će se pojaviti novo polje.</p>
+          </div>
+        </div>
 
-        <div>
-          <label>Uređaj:</label>
-          <select name="equipmentId">
+        <div id="deviceRows" class="mt-5 space-y-4">
+          <div class="device-row flex flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/50 p-4 md:flex-row md:items-end">
+            <div class="flex-1">
+              <label class="mb-2 block text-sm font-medium text-slate-200">Uređaj</label>
+              <select name="equipmentId" class="device-select w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
+                <option value="">-- Odaberite uređaj --</option>
+
+                <% devices.forEach(device => { %>
+                  <option value="<%= device.id %>">
+                    <%= device.name %> - <%= device.serial_number %> - <%= device.manufacturer || "N/A" %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="flex items-center justify-between gap-4">
+        <p class="text-sm text-slate-400">Nova prazna stavka pojavit će se automatski nakon odabira uređaja.</p>
+        <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">Pošalji zahtjev</button>
+      </div>
+    </form>
+
+    <template id="deviceRowTemplate">
+      <div class="device-row flex flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/50 p-4 md:flex-row md:items-end">
+        <div class="flex-1">
+          <label class="mb-2 block text-sm font-medium text-slate-200">Uređaj</label>
+          <select name="equipmentId" class="device-select w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
             <option value="">-- Odaberite uređaj --</option>
 
             <% devices.forEach(device => { %>
               <option value="<%= device.id %>">
-                <%= device.name %>
-                -
-                <%= device.serial_number %>
-                -
-                <%= device.manufacturer || "N/A" %>
+                <%= device.name %> - <%= device.serial_number %> - <%= device.manufacturer || "N/A" %>
               </option>
             <% }) %>
           </select>
         </div>
 
-        <div>
-          <label>Cijena po danu:</label>
-          <input type="number" step="0.01" name="pricePerDay">
-        </div>
-      </fieldset>
+        <button type="button" class="remove-row-button inline-flex items-center justify-center rounded-xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/20 md:self-end">Ukloni</button>
+      </div>
+    </template>
 
-      <br>
-    <% } %>
+    <script>
+      const deviceRows = document.getElementById("deviceRows");
+      const template = document.getElementById("deviceRowTemplate");
 
-    <button type="submit">Pošalji zahtjev</button>
-  </form>
-</body>
-</html>
+      function getDeviceSelects() {
+        return Array.from(document.querySelectorAll(".device-select"));
+      }
+
+      function hasEmptyLastSelect() {
+        const selects = getDeviceSelects();
+        const lastSelect = selects[selects.length - 1];
+
+        return lastSelect && lastSelect.value === "";
+      }
+
+      function addNewRowIfNeeded() {
+        if (hasEmptyLastSelect()) {
+          return;
+        }
+
+        const clone = template.content.cloneNode(true);
+        deviceRows.appendChild(clone);
+        attachEvents();
+      }
+
+      function removeRow(event) {
+        event.target.closest(".device-row").remove();
+      }
+
+      function attachEvents() {
+        document.querySelectorAll(".device-select").forEach(select => {
+          select.onchange = addNewRowIfNeeded;
+        });
+
+        document.querySelectorAll(".remove-row-button").forEach(button => {
+          button.onclick = removeRow;
+        });
+      }
+
+      attachEvents();
+    </script>
+  </section>
+</main>
+
+<%- include("../partials/page-end") %>

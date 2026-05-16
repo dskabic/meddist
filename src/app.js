@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authRoutes");
 const equipmentRoutes = require("./routes/equipmentRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
 const rentalRequestRoutes = require("./routes/rentalRequestRoutes");
+const workerRentalRequestRoutes = require("./routes/workerRentalRequestRoutes");
 const app = express();
 
 app.set("view engine", "ejs");
@@ -35,4 +36,5 @@ app.use("/", authRoutes);
 app.use("/worker/warehouse/equipment", equipmentRoutes);
 app.use("/worker/service/records", serviceRoutes);
 app.use("/client/rental-requests", rentalRequestRoutes);
+app.use("/worker/orders/rental-requests", workerRentalRequestRoutes);
 module.exports = app;

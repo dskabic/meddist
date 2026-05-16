@@ -14,6 +14,14 @@ function mapFormToEquipment(data) {
     currentStock:
       data.currentStock !== undefined && data.currentStock !== ""
         ? Number(data.currentStock)
+        : null,
+    defaultRentalPricePerDay:
+      data.defaultRentalPricePerDay !== undefined && data.defaultRentalPricePerDay !== ""
+        ? Number(data.defaultRentalPricePerDay)
+        : null,
+    defaultUnitPrice:
+      data.defaultUnitPrice !== undefined && data.defaultUnitPrice !== ""
+        ? Number(data.defaultUnitPrice)
         : null
   });
 }

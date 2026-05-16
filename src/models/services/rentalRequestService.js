@@ -11,22 +11,14 @@ function parseItemsFromForm(body) {
     ? body.equipmentId
     : [body.equipmentId];
 
-  const prices = Array.isArray(body.pricePerDay)
-    ? body.pricePerDay
-    : [body.pricePerDay];
-
-  for (let i = 0; i < equipmentIds.length; i++) {
-    const equipmentId = equipmentIds[i];
-    const pricePerDay = prices[i];
-
-    if (!equipmentId && !pricePerDay) {
+  for (const equipmentId of equipmentIds) {
+    if (!equipmentId) {
       continue;
     }
 
     items.push(
       new RentalRequestItem({
-        equipmentId: Number(equipmentId),
-        pricePerDay: Number(pricePerDay)
+        equipmentId: Number(equipmentId)
       })
     );
   }

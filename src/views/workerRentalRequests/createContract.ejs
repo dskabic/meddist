@@ -1,0 +1,171 @@
+<%- include("../partials/page-start", { pageTitle: `Kreiranje ugovora #${request.id}` }) %>
+
+<main class="mx-auto max-w-5xl">
+  <section class="rounded-3xl border border-white/10 bg-white/8 p-8 shadow-2xl shadow-slate-950/40 backdrop-blur-xl sm:p-10">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <p class="text-sm font-medium uppercase tracking-[0.24em] text-cyan-200">Ugovor</p>
+        <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white">Kreiranje ugovora za zahtjev #<%= request.id %></h1>
+        <p class="mt-3 text-sm leading-6 text-slate-300">Popunite osnovne podatke i po potrebi prilagodite stavke ugovora.</p>
+      </div>
+
+      <a href="/worker/orders/rental-requests" class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Natrag na popis zahtjeva</a>
+    </div>
+
+    <% if (errors && errors.length > 0) { %>
+      <div class="mt-6 rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-4 text-sm text-rose-200">
+        <ul class="list-disc space-y-1 pl-5">
+          <% errors.forEach(error => { %>
+            <li><%= error %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } %>
+
+    <form method="POST" action="/worker/orders/rental-requests/<%= request.id %>/create-contract" class="mt-8 space-y-8">
+      <section class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+        <h2 class="text-lg font-semibold text-white">Zaglavlje ugovora</h2>
+
+        <div class="mt-5 grid gap-5 md:grid-cols-3">
+          <div>
+            <label class="mb-2 block text-sm font-medium text-slate-200">Klijent</label>
+            <select name="clientId" class="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
+              <% clients.forEach(client => { %>
+                <option value="<%= client.id %>" <%= Number((formData && formData.clientId) || request.client_id) === Number(client.id) ? "selected" : "" %>><%= client.name %> - <%= client.oib %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-medium text-slate-200">Datum početka najma</label>
+            <input type="date" name="rentalStartDate" value="<%= formData && formData.rentalStartDate ? formData.rentalStartDate : new Date(request.desired_start_date).toISOString().slice(0, 10) %>" class="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-medium text-slate-200">Očekivani datum povrata</label>
+            <input type="date" name="expectedReturnDate" value="<%= formData && formData.expectedReturnDate ? formData.expectedReturnDate : new Date(request.desired_return_date).toISOString().slice(0, 10) %>" class="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-2xl border border-white/10 bg-slate-900/50 p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-semibold text-white">Stavke ugovora</h2>
+            <p class="mt-1 text-sm leading-6 text-slate-300">Dodajte uređaje i ugovorenu cijenu po danu za svaku stavku.</p>
+          </div>
+
+          <button type="button" id="addRowButton" class="inline-flex items-center justify-center rounded-xl bg-cyan-400 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">Dodaj stavku</button>
+        </div>
+
+        <div class="mt-6 overflow-hidden rounded-2xl border border-white/10">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-white/10 text-left text-sm" id="itemsTable">
+              <thead class="bg-white/5 text-slate-300">
+                <tr>
+                  <th class="px-5 py-4 font-semibold">Uređaj</th>
+                  <th class="px-5 py-4 font-semibold">Ugovorena cijena po danu</th>
+                  <th class="px-5 py-4 font-semibold">Akcija</th>
+                </tr>
+              </thead>
+
+              <tbody id="itemsBody" class="divide-y divide-white/10">
+                <% request.items.forEach(item => { %>
+                  <tr class="item-row bg-slate-950/40 align-top text-slate-100">
+                    <td class="px-5 py-4">
+                      <select name="equipmentId" class="equipment-select w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
+                        <option value="">-- Odaberite uređaj --</option>
+
+                        <% devices.forEach(device => { %>
+                          <option value="<%= device.id %>" data-price="<%= device.default_rental_price_per_day || '' %>" <%= Number(item.equipment_id) === Number(device.id) ? "selected" : "" %>><%= device.name %> - <%= device.serial_number %> - <%= device.manufacturer || "N/A" %></option>
+                        <% }) %>
+                      </select>
+                    </td>
+
+                    <td class="px-5 py-4">
+                      <input type="number" step="0.01" name="pricePerDay" class="price-input w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20" value="<%= item.default_rental_price_per_day || '' %>">
+                    </td>
+
+                    <td class="px-5 py-4">
+                      <button type="button" class="remove-row-button inline-flex items-center justify-center rounded-xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/20">Obriši stavku</button>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <div class="flex justify-end">
+        <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">Kreiraj ugovor</button>
+      </div>
+    </form>
+
+    <template id="itemRowTemplate">
+      <tr class="item-row bg-slate-950/40 align-top text-slate-100">
+        <td class="px-5 py-4">
+          <select name="equipmentId" class="equipment-select w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
+            <option value="">-- Odaberite uređaj --</option>
+
+            <% devices.forEach(device => { %>
+              <option value="<%= device.id %>" data-price="<%= device.default_rental_price_per_day || '' %>"><%= device.name %> - <%= device.serial_number %> - <%= device.manufacturer || "N/A" %></option>
+            <% }) %>
+          </select>
+        </td>
+
+        <td class="px-5 py-4">
+          <input type="number" step="0.01" name="pricePerDay" class="price-input w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
+        </td>
+
+        <td class="px-5 py-4">
+          <button type="button" class="remove-row-button inline-flex items-center justify-center rounded-xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/20">Obriši stavku</button>
+        </td>
+      </tr>
+    </template>
+
+    <script>
+      const itemsBody = document.getElementById("itemsBody");
+      const template = document.getElementById("itemRowTemplate");
+      const addRowButton = document.getElementById("addRowButton");
+
+      function attachEvents() {
+        document.querySelectorAll(".remove-row-button").forEach(button => {
+          button.onclick = function () {
+            const rows = document.querySelectorAll(".item-row");
+
+            if (rows.length === 1) {
+              alert("Ugovor mora imati barem jednu stavku.");
+              return;
+            }
+
+            button.closest(".item-row").remove();
+          };
+        });
+
+        document.querySelectorAll(".equipment-select").forEach(select => {
+          select.onchange = function () {
+            const selectedOption = select.options[select.selectedIndex];
+            const price = selectedOption.getAttribute("data-price");
+            const row = select.closest(".item-row");
+            const priceInput = row.querySelector(".price-input");
+
+            if (price && !priceInput.value) {
+              priceInput.value = price;
+            }
+          };
+        });
+      }
+
+      addRowButton.onclick = function () {
+        const clone = template.content.cloneNode(true);
+        itemsBody.appendChild(clone);
+        attachEvents();
+      };
+
+      attachEvents();
+    </script>
+  </section>
+</main>
+
+<%- include("../partials/page-end") %>

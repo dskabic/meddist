@@ -8,16 +8,20 @@ class Equipment {
     availabilityStatus = null,
     lotNumber = null,
     currentStock = null,
+    defaultRentalPricePerDay = null,
+    defaultUnitPrice = null,
     active = true
   }) {
     this.id = id;
     this.name = name;
     this.manufacturer = manufacturer;
-    this.type = type; // "UREDAJ" or "POTROSNI_MATERIJAL"
+    this.type = type;
     this.serialNumber = serialNumber;
     this.availabilityStatus = availabilityStatus;
     this.lotNumber = lotNumber;
     this.currentStock = currentStock;
+    this.defaultRentalPricePerDay = defaultRentalPricePerDay;
+    this.defaultUnitPrice = defaultUnitPrice;
     this.active = active;
   }
 

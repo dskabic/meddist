@@ -25,7 +25,6 @@ async function createForm(req, res) {
         desiredStartDate: "",
         desiredReturnDate: "",
         equipmentId: [],
-        pricePerDay: []
       }
     });
   } catch (error) {
