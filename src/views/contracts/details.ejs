@@ -1,137 +1,141 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Detalji ugovora</title>
-</head>
-<body>
-  <h1>Detalji ugovora #<%= contract.id %></h1>
+<%- include("../partials/page-start", { pageTitle: `Detalji ugovora #${contract.id}` }) %>
 
-  <p>
-    <a href="/worker/orders/contracts">Natrag na popis ugovora</a>
-  </p>
+<main class="mx-auto max-w-5xl space-y-6">
+  <section class="rounded-3xl border border-white/10 bg-white/8 p-6 shadow-2xl shadow-slate-950/40 backdrop-blur-xl sm:p-8">
+    <div class="flex items-start justify-between gap-6">
+      <div>
+        <p class="text-sm font-medium uppercase tracking-[0.24em] text-cyan-200">Ugovor</p>
+        <h1 class="mt-2 text-2xl font-semibold text-white">Detalji ugovora #<%= contract.id %></h1>
+        <p class="mt-1 text-sm text-slate-300">Zaglavlje ugovora i popis stavki</p>
+      </div>
 
-  <h3>Zaglavlje ugovora</h3>
+      <div class="hidden items-center gap-3 sm:flex">
+        <a href="/worker/orders/contracts" class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">Natrag na popis ugovora</a>
+      </div>
+    </div>
+  </section>
 
-  <table border="1" cellpadding="6">
-    <tr>
-      <th>Klijent</th>
-      <td><%= contract.client_name %></td>
-    </tr>
-    <tr>
-      <th>OIB</th>
-      <td><%= contract.client_oib %></td>
-    </tr>
-    <tr>
-      <th>Adresa</th>
-      <td>
-        <%= contract.client_street || "-" %>,
-        <%= contract.client_postal_code || "" %>
-        <%= contract.client_city || "" %>
-      </td>
-    </tr>
-    <tr>
-      <th>Email klijenta</th>
-      <td><%= contract.client_email %></td>
-    </tr>
-    <tr>
-      <th>Djelatnik</th>
-      <td><%= contract.worker_name %> (<%= contract.worker_role %>)</td>
-    </tr>
-    <tr>
-      <th>Email djelatnika</th>
-      <td><%= contract.worker_email %></td>
-    </tr>
-    <tr>
-      <th>Datum sklapanja</th>
-      <td><%= new Date(contract.contract_date).toLocaleDateString("hr-HR") %></td>
-    </tr>
-    <tr>
-      <th>Početak najma</th>
-      <td>
-        <%= contract.rental_start_date ? new Date(contract.rental_start_date).toLocaleDateString("hr-HR") : "-" %>
-      </td>
-    </tr>
-    <tr>
-      <th>Očekivani povrat</th>
-      <td><%= new Date(contract.expected_return_date).toLocaleDateString("hr-HR") %></td>
-    </tr>
-    <tr>
-      <th>Status</th>
-      <td><%= contract.status %></td>
-    </tr>
-    <tr>
-      <th>ID zahtjeva</th>
-      <td><%= contract.request_id %></td>
-    </tr>
-  </table>
+  <section class="grid gap-6 sm:grid-cols-2">
+    <div class="rounded-2xl border border-white/8 bg-slate-950/50 p-5">
+      <h3 class="text-sm font-semibold text-slate-300">Zaglavlje ugovora</h3>
+      <dl class="mt-4 grid grid-cols-1 gap-y-3 gap-x-4 sm:grid-cols-2">
+        <div>
+          <dt class="text-xs text-slate-400">Klijent</dt>
+          <dd class="mt-1 text-sm text-white"><%= contract.client_name %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-slate-400">OIB</dt>
+          <dd class="mt-1 text-sm text-white"><%= contract.client_oib %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-slate-400">Adresa</dt>
+          <dd class="mt-1 text-sm text-white"><%= contract.client_street || "-" %>, <%= contract.client_postal_code || "" %> <%= contract.client_city || "" %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-slate-400">Email klijenta</dt>
+          <dd class="mt-1 text-sm text-white"><%= contract.client_email %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-slate-400">Djelatnik</dt>
+          <dd class="mt-1 text-sm text-white"><%= contract.worker_name %> (<%= contract.worker_role %>)</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-slate-400">Email djelatnika</dt>
+          <dd class="mt-1 text-sm text-white"><%= contract.worker_email %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-slate-400">Datum sklapanja</dt>
+          <dd class="mt-1 text-sm text-white"><%= new Date(contract.contract_date).toLocaleDateString("hr-HR") %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-slate-400">Status</dt>
+          <dd class="mt-1 text-sm text-white"><%= contract.status %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-slate-400">Početak najma</dt>
+          <dd class="mt-1 text-sm text-white"><%= contract.rental_start_date ? new Date(contract.rental_start_date).toLocaleDateString("hr-HR") : "-" %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-slate-400">Očekivani povrat</dt>
+          <dd class="mt-1 text-sm text-white"><%= new Date(contract.expected_return_date).toLocaleDateString("hr-HR") %></dd>
+        </div>
+        <div>
+          <dt class="text-xs text-slate-400">ID zahtjeva</dt>
+          <dd class="mt-1 text-sm text-white"><%= contract.request_id %></dd>
+        </div>
+      </dl>
+    </div>
 
-  <h3>Stavke ugovora</h3>
+    <div class="rounded-2xl border border-white/8 bg-slate-950/50 p-5">
+      <h3 class="text-sm font-semibold text-slate-300">Stavke ugovora</h3>
 
-  <table border="1" cellpadding="6">
-    <thead>
-      <tr>
-        <th>Uređaj</th>
-        <th>Proizvođač</th>
-        <th>Serijski broj</th>
-        <th>Status uređaja</th>
-        <th>Ugovorena cijena po danu</th>
-      </tr>
-    </thead>
+      <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+          <thead class="text-slate-400">
+            <tr>
+              <th class="px-3 py-2 font-medium">Uređaj</th>
+              <th class="px-3 py-2 font-medium">Proizvođač</th>
+              <th class="px-3 py-2 font-medium">Serijski broj</th>
+              <th class="px-3 py-2 font-medium">Status uređaja</th>
+              <th class="px-3 py-2 font-medium">Ugovorena cijena po danu</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/6">
+            <% if (contract.items.length === 0) { %>
+              <tr>
+                <td colspan="5" class="px-3 py-8 text-center text-slate-300">Ugovor nema stavki.</td>
+              </tr>
+            <% } %>
 
-    <tbody>
-      <% if (contract.items.length === 0) { %>
-        <tr>
-          <td colspan="5">Ugovor nema stavki.</td>
-        </tr>
-      <% } %>
+            <% contract.items.forEach(item => { %>
+              <tr class="text-white">
+                <td class="px-3 py-3"><%= item.equipment_name %></td>
+                <td class="px-3 py-3 text-slate-300"><%= item.manufacturer || "-" %></td>
+                <td class="px-3 py-3 text-slate-300"><%= item.serial_number %></td>
+                <td class="px-3 py-3 text-slate-300"><%= item.availability_status %></td>
+                <td class="px-3 py-3 text-slate-300"><%= item.agreed_price_per_day %> €</td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
-      <% contract.items.forEach(item => { %>
-        <tr>
-          <td><%= item.equipment_name %></td>
-          <td><%= item.manufacturer || "-" %></td>
-          <td><%= item.serial_number %></td>
-          <td><%= item.availability_status %></td>
-          <td><%= item.agreed_price_per_day %> €</td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
+  <section class="rounded-2xl border border-white/8 bg-slate-950/50 p-5">
+    <h3 class="text-sm font-semibold text-slate-300">Izračun</h3>
 
-  <br>
+    <div class="mt-4">
+      <%
+        const start = contract.rental_start_date ? new Date(contract.rental_start_date) : null;
+        const end = new Date(contract.expected_return_date);
+        let days = null;
 
-  <%
-    const start = contract.rental_start_date ? new Date(contract.rental_start_date) : null;
-    const end = new Date(contract.expected_return_date);
-    let days = null;
+        if (start) {
+          days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        }
 
-    if (start) {
-      days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-    }
+        const dailyTotal = contract.items.reduce((sum, item) => {
+          return sum + Number(item.agreed_price_per_day);
+        }, 0);
+      %>
 
-    const dailyTotal = contract.items.reduce((sum, item) => {
-      return sum + Number(item.agreed_price_per_day);
-    }, 0);
-  %>
+      <dl class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div class="rounded-lg bg-slate-900/40 p-3">
+          <dt class="text-xs text-slate-400">Dnevni ukupni iznos</dt>
+          <dd class="mt-1 text-sm font-medium text-white"><%= dailyTotal.toFixed(2) %> €</dd>
+        </div>
+        <div class="rounded-lg bg-slate-900/40 p-3">
+          <dt class="text-xs text-slate-400">Broj dana</dt>
+          <dd class="mt-1 text-sm font-medium text-white"><%= days !== null ? days : "-" %></dd>
+        </div>
+        <div class="rounded-lg bg-slate-900/40 p-3">
+          <dt class="text-xs text-slate-400">Ukupno procijenjeno</dt>
+          <dd class="mt-1 text-sm font-medium text-white"><%= days !== null ? (dailyTotal * days).toFixed(2) + " €" : "-" %></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+</main>
 
-  <h3>Izračun</h3>
-
-  <table border="1" cellpadding="6">
-    <tr>
-      <th>Dnevni ukupni iznos</th>
-      <td><%= dailyTotal.toFixed(2) %> €</td>
-    </tr>
-
-    <tr>
-      <th>Broj dana</th>
-      <td><%= days !== null ? days : "-" %></td>
-    </tr>
-
-    <tr>
-      <th>Ukupno procijenjeno</th>
-      <td>
-        <%= days !== null ? (dailyTotal * days).toFixed(2) + " €" : "-" %>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
+<%- include("../partials/page-end") %>
