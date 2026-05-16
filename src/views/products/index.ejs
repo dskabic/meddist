@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dostupni artikli</title>
+</head>
+<body>
+  <h1>Dostupni artikli</h1>
+
+  <p>
+    <a href="/client/dashboard">Natrag na dashboard</a>
+  </p>
+
+  <form method="GET" action="/client/products">
+    <input
+      type="text"
+      name="search"
+      placeholder="Pretraži po nazivu, proizvođaču, serijskom broju ili LOT broju"
+      value="<%= search %>"
+    >
+
+    <button type="submit">Pretraži</button>
+    <a href="/client/products">Očisti</a>
+  </form>
+
+  <br>
+
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>Naziv</th>
+        <th>Proizvođač</th>
+        <th>Vrsta</th>
+        <th>Serijski broj</th>
+        <th>Status</th>
+        <th>Cijena najma/dan</th>
+        <th>LOT broj</th>
+        <th>Zaliha</th>
+        <th>Jedinična cijena</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% if (products.length === 0) { %>
+        <tr>
+          <td colspan="9">Nema dostupnih artikala.</td>
+        </tr>
+      <% } %>
+
+      <% products.forEach(product => { %>
+        <tr>
+          <td><%= product.name %></td>
+          <td><%= product.manufacturer || "-" %></td>
+
+          <td>
+            <% if (product.type === "UREDAJ") { %>
+              Uređaj za najam
+            <% } else if (product.type === "POTROSNI_MATERIJAL") { %>
+              Potrošni materijal
+            <% } else { %>
+              Nepoznato
+            <% } %>
+          </td>
+
+          <td><%= product.serial_number || "-" %></td>
+          <td><%= product.availability_status || "-" %></td>
+
+          <td>
+            <%= product.rental_price_per_day !== null ? product.rental_price_per_day : "-" %>
+          </td>
+
+          <td><%= product.lot_number || "-" %></td>
+
+          <td>
+            <%= product.current_stock !== null ? product.current_stock : "-" %>
+          </td>
+
+          <td>
+            <%= product.unit_price !== null ? product.unit_price : "-" %>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <br>
+
+  <p>
+    <a href="/client/rental-requests/create">
+      <button>Napravi zahtjev za najam</button>
+    </a>
+  </p>
+</body>
+</html>
