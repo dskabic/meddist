@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Novi zahtjev za najam</title>
+</head>
+<body>
+  <h1>Novi zahtjev za najam</h1>
+
+  <p>
+    <a href="/client/rental-requests">Natrag na popis</a>
+  </p>
+
+  <% if (errors && errors.length > 0) { %>
+    <div style="color: red;">
+      <ul>
+        <% errors.forEach(error => { %>
+          <li><%= error %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <form method="POST" action="/client/rental-requests/create">
+    <h3>Zaglavlje zahtjeva</h3>
+
+    <div>
+      <label>Željeni datum početka najma:</label>
+      <input
+        type="date"
+        name="desiredStartDate"
+        value="<%= formData.desiredStartDate || '' %>"
+      >
+    </div>
+
+    <div>
+      <label>Željeni datum povrata:</label>
+      <input
+        type="date"
+        name="desiredReturnDate"
+        value="<%= formData.desiredReturnDate || '' %>"
+      >
+    </div>
+
+    <hr>
+
+    <h3>Stavke zahtjeva</h3>
+
+    <p>Za početak su dostupne 3 stavke. Prazne stavke se ignoriraju.</p>
+
+    <% for (let i = 0; i < 3; i++) { %>
+      <fieldset>
+        <legend>Stavka <%= i + 1 %></legend>
+
+        <div>
+          <label>Uređaj:</label>
+          <select name="equipmentId">
+            <option value="">-- Odaberite uređaj --</option>
+
+            <% devices.forEach(device => { %>
+              <option value="<%= device.id %>">
+                <%= device.name %>
+                -
+                <%= device.serial_number %>
+                -
+                <%= device.manufacturer || "N/A" %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div>
+          <label>Cijena po danu:</label>
+          <input type="number" step="0.01" name="pricePerDay">
+        </div>
+      </fieldset>
+
+      <br>
+    <% } %>
+
+    <button type="submit">Pošalji zahtjev</button>
+  </form>
+</body>
+</html>

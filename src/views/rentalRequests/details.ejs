@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Detalji zahtjeva za najam</title>
+</head>
+<body>
+  <h1>Detalji zahtjeva za najam #<%= request.id %></h1>
+
+  <p>
+    <a href="/client/rental-requests">Natrag na popis</a>
+  </p>
+
+  <h3>Zaglavlje</h3>
+
+  <table border="1" cellpadding="6">
+    <tr>
+      <th>Klijent</th>
+      <td><%= request.client_name %></td>
+    </tr>
+    <tr>
+      <th>Datum podnošenja</th>
+      <td><%= new Date(request.submitted_date).toLocaleDateString("hr-HR") %></td>
+    </tr>
+    <tr>
+      <th>Početak najma</th>
+      <td><%= new Date(request.desired_start_date).toLocaleDateString("hr-HR") %></td>
+    </tr>
+    <tr>
+      <th>Datum povrata</th>
+      <td><%= new Date(request.desired_return_date).toLocaleDateString("hr-HR") %></td>
+    </tr>
+    <tr>
+      <th>Status</th>
+      <td><%= request.status %></td>
+    </tr>
+  </table>
+
+  <h3>Stavke</h3>
+
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>Uređaj</th>
+        <th>Proizvođač</th>
+        <th>Serijski broj</th>
+        <th>Status uređaja</th>
+        <th>Cijena po danu</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% request.items.forEach(item => { %>
+        <tr>
+          <td><%= item.equipment_name %></td>
+          <td><%= item.manufacturer || "-" %></td>
+          <td><%= item.serial_number %></td>
+          <td><%= item.availability_status %></td>
+          <td><%= item.price_per_day %> €</td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>

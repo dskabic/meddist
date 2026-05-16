@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Zahtjevi za najam</title>
+</head>
+<body>
+  <h1>Moji zahtjevi za najam</h1>
+
+  <p>
+    <a href="/client/dashboard">Natrag na dashboard</a>
+  </p>
+
+  <p>
+    <a href="/client/rental-requests/create">
+      <button>Novi zahtjev za najam</button>
+    </a>
+  </p>
+
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Datum podnošenja</th>
+        <th>Početak najma</th>
+        <th>Povrat</th>
+        <th>Status</th>
+        <th>Broj stavki</th>
+        <th>Akcije</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% if (requests.length === 0) { %>
+        <tr>
+          <td colspan="7">Nemate zahtjeva za najam.</td>
+        </tr>
+      <% } %>
+
+      <% requests.forEach(request => { %>
+        <tr>
+          <td><%= request.id %></td>
+          <td><%= new Date(request.submitted_date).toLocaleDateString("hr-HR") %></td>
+          <td><%= new Date(request.desired_start_date).toLocaleDateString("hr-HR") %></td>
+          <td><%= new Date(request.desired_return_date).toLocaleDateString("hr-HR") %></td>
+          <td><%= request.status %></td>
+          <td><%= request.item_count %></td>
+          <td>
+            <a href="/client/rental-requests/<%= request.id %>">Detalji</a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>
