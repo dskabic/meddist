@@ -118,4 +118,131 @@ describe("PurchaseRepository", () => {
       [9, 3]
     );
   });
+
+  test("shipOrder should rollback when stock is insufficient", async () => {
+    const mockClient = {
+      query: jest.fn(),
+      release: jest.fn()
+    };
+
+    pool.connect.mockResolvedValue(mockClient);
+    mockClient.query
+      .mockResolvedValueOnce()
+      .mockResolvedValueOnce({ rows: [{ id_narudzbe: 9, status_isporuke: "U obradi" }] })
+      .mockResolvedValueOnce({ rows: [{ article_id: 4, quantity: 5 }] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce();
+
+    await expect(
+      purchaseRepository.shipOrder(9, 3)
+    ).rejects.toThrow("Artikl ID 4 nema dovoljno zaliha za slanje narudžbe.");
+
+    expect(mockClient.query).toHaveBeenCalledWith("ROLLBACK");
+  });
+
+  test("deliverOrder should create invoice and mark order as Isporučeno", async () => {
+    const mockClient = {
+      query: jest.fn(),
+      release: jest.fn()
+    };
+
+    pool.connect.mockResolvedValue(mockClient);
+    mockClient.query
+      .mockResolvedValueOnce()
+      .mockResolvedValueOnce({ rows: [{ id_narudzbe: 22, status_isporuke: "Poslano" }] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ total_amount: 18.4 }] })
+      .mockResolvedValueOnce({ rows: [{ id_racuna: 5 }] })
+      .mockResolvedValueOnce()
+      .mockResolvedValueOnce();
+
+    pool.query
+      .mockResolvedValueOnce({
+        rows: [{
+          id: 22,
+          created_date: "2026-05-16",
+          status: "Isporučeno",
+          client_id: 1,
+          worker_id: 3,
+          client_name: "KBC Zagreb",
+          client_oib: "12345678901",
+          client_city: "Zagreb",
+          worker_name: "Ivan Horvat",
+          invoice_id: 5,
+          invoice_date: "2026-05-16",
+          invoice_total: 18.4
+        }]
+      })
+      .mockResolvedValueOnce({
+        rows: [{
+          article_name: "Kirurške rukavice",
+          manufacturer: "Medline",
+          lot_number: "LOT-10",
+          quantity: 4,
+          unit_price: 4.6
+        }]
+      });
+
+    const result = await purchaseRepository.deliverOrder(22, 3);
+
+    expect(result.invoiceId).toBe(5);
+    expect(mockClient.query).toHaveBeenCalledWith(
+      expect.stringContaining("INSERT INTO Racun"),
+      [18.4, 22]
+    );
+    expect(mockClient.query).toHaveBeenCalledWith(
+      expect.stringContaining("SET Status_Isporuke = 'Isporučeno'"),
+      [22, 3]
+    );
+  });
+
+  test("deliverOrder should reuse existing invoice", async () => {
+    const mockClient = {
+      query: jest.fn(),
+      release: jest.fn()
+    };
+
+    pool.connect.mockResolvedValue(mockClient);
+    mockClient.query
+      .mockResolvedValueOnce()
+      .mockResolvedValueOnce({ rows: [{ id_narudzbe: 22, status_isporuke: "Poslano" }] })
+      .mockResolvedValueOnce({ rows: [{ id_racuna: 11 }] })
+      .mockResolvedValueOnce()
+      .mockResolvedValueOnce();
+
+    pool.query
+      .mockResolvedValueOnce({
+        rows: [{
+          id: 22,
+          created_date: "2026-05-16",
+          status: "Isporučeno",
+          client_id: 1,
+          worker_id: 3,
+          client_name: "KBC Zagreb",
+          client_oib: "12345678901",
+          client_city: "Zagreb",
+          worker_name: "Ivan Horvat",
+          invoice_id: 11,
+          invoice_date: "2026-05-16",
+          invoice_total: 18.4
+        }]
+      })
+      .mockResolvedValueOnce({
+        rows: [{
+          article_name: "Kirurške rukavice",
+          manufacturer: "Medline",
+          lot_number: "LOT-10",
+          quantity: 4,
+          unit_price: 4.6
+        }]
+      });
+
+    const result = await purchaseRepository.deliverOrder(22, 3);
+
+    expect(result.invoiceId).toBe(11);
+    expect(mockClient.query).not.toHaveBeenCalledWith(
+      expect.stringContaining("INSERT INTO Racun"),
+      expect.anything()
+    );
+  });
 });
