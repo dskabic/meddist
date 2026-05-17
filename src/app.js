@@ -56,9 +56,20 @@ function resolveHomePath(user) {
   return "/";
 }
 
+function normalizePath(pathname) {
+  if (!pathname || pathname === "/") {
+    return "/";
+  }
+
+  return pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+}
+
 app.use((req, res, next) => {
   res.locals.currentUser = req.session.user || null;
   res.locals.homeHref = resolveHomePath(req.session.user);
+  res.locals.showHomeLink =
+    Boolean(req.session.user) &&
+    normalizePath(req.path) !== normalizePath(res.locals.homeHref);
   next();
 });
 

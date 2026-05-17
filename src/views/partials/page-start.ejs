@@ -46,6 +46,16 @@
       text-decoration: none;
     }
 
+    .app-top-form {
+      margin: 0;
+    }
+
+    .app-top-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .app-panel {
       border: 1px solid rgba(148, 163, 184, 0.14);
       background: rgba(17, 24, 39, 0.92);
@@ -68,9 +78,13 @@
 </head>
 <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
   <div class="relative mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-    <header class="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
-      <a href="<%= homeHref %>" class="app-top-link">Početna</a>
+    <header class="mb-6 flex items-center justify-end border-b border-white/10 pb-4">
       <% if (currentUser) { %>
-        <span class="text-sm text-slate-400"><%= currentUser.name %></span>
+        <div class="app-top-user">
+          <span class="text-sm text-slate-400"><%= currentUser.name %></span>
+          <form method="POST" action="/logout" class="app-top-form">
+            <button type="submit" class="app-top-link">Odjava</button>
+          </form>
+        </div>
       <% } %>
     </header>
