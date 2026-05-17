@@ -240,6 +240,27 @@ async function update(id, equipment) {
     client.release();
   }
 }
+async function isDeviceCurrentlyRented(id) {
+  const result = await pool.query(
+    `
+    SELECT
+      u.ID_Ugovora AS contract_id,
+      u.Datum_Pocetka_Najma AS rental_start_date,
+      u.Ocekivani_Povrat AS expected_return_date,
+      u.Status AS contract_status
+    FROM Ugovor_o_najmu u
+    JOIN Stavka_ugovora su
+      ON u.ID_Ugovora = su.ID_Ugovora
+    WHERE su.ID_Artikla = $1
+      AND u.Status IN ('Na čekanju potvrde korisnika', 'Potvrđen')
+      AND CURRENT_DATE BETWEEN u.Datum_Pocetka_Najma AND u.Ocekivani_Povrat
+    LIMIT 1
+    `,
+    [id]
+  );
+
+  return result.rows[0] || null;
+}
 
 async function softDelete(id) {
   await pool.query(
@@ -257,5 +278,6 @@ module.exports = {
   findById,
   create,
   update,
-  softDelete
+  softDelete,
+  isDeviceCurrentlyRented
 };
