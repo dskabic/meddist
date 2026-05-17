@@ -7,7 +7,8 @@ async function index(req, res) {
 
     res.render("equipment/index", {
       equipment,
-      search
+      search,
+      errors: []
     });
   } catch (error) {
     res.status(500).send(error.message);
@@ -86,7 +87,14 @@ async function remove(req, res) {
     await equipmentService.deleteEquipment(req.params.id);
     res.redirect("/worker/warehouse/equipment");
   } catch (error) {
-    res.status(500).send(error.message);
+    const search = req.query.search || "";
+    const equipment = await equipmentService.getAllEquipment(search);
+
+    res.status(400).render("equipment/index", {
+      equipment,
+      search,
+      errors: error.validationErrors || [error.message]
+    });
   }
 }
 

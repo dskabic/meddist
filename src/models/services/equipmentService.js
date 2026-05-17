@@ -71,6 +71,24 @@ async function updateEquipment(id, formData) {
 }
 
 async function deleteEquipment(id) {
+  const equipment = await equipmentRepository.findById(id);
+
+  if (!equipment) {
+    throw new Error("Artikl nije pronađen.");
+  }
+
+  if (equipment.type === "UREDAJ") {
+    const activeRental = await equipmentRepository.isDeviceCurrentlyRented(id);
+
+    if (activeRental) {
+      const error = new Error("Uređaj koji je trenutno iznajmljen ne može se obrisati.");
+      error.validationErrors = [
+        `Uređaj je trenutno iznajmljen prema ugovoru #${activeRental.contract_id} u razdoblju od ${activeRental.rental_start_date.toISOString().slice(0, 10)} do ${activeRental.expected_return_date.toISOString().slice(0, 10)}.`
+      ];
+      throw error;
+    }
+  }
+
   return equipmentRepository.softDelete(id);
 }
 
