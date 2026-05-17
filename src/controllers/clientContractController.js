@@ -2,12 +2,10 @@ const contractListService = require("../models/services/contractListService");
 
 async function index(req, res) {
   try {
-    const search = req.query.search || "";
-    const contracts = await contractListService.getAllContracts(search);
+    const contracts = await contractListService.getClientContracts(req.session.user.id);
 
-    res.render("contracts/index", {
-      contracts,
-      search
+    res.render("clientContracts/index", {
+      contracts
     });
   } catch (error) {
     res.status(500).send(error.message);
@@ -16,9 +14,12 @@ async function index(req, res) {
 
 async function details(req, res) {
   try {
-    const contract = await contractListService.getContractById(req.params.id);
+    const contract = await contractListService.getContractById(
+      req.params.id,
+      req.session.user
+    );
 
-    res.render("contracts/details", {
+    res.render("clientContracts/details", {
       contract,
       error: null,
       canCancel: contractListService.canCancelContract(contract)
@@ -30,13 +31,16 @@ async function details(req, res) {
 
 async function cancel(req, res) {
   try {
-    await contractListService.cancelContractByWorker(req.params.id);
-    res.redirect(`/worker/orders/contracts/${req.params.id}`);
+    await contractListService.cancelContractByClient(req.params.id, req.session.user);
+    res.redirect(`/client/contracts/${req.params.id}`);
   } catch (error) {
     try {
-      const contract = await contractListService.getContractById(req.params.id);
+      const contract = await contractListService.getContractById(
+        req.params.id,
+        req.session.user
+      );
 
-      res.status(400).render("contracts/details", {
+      res.status(400).render("clientContracts/details", {
         contract,
         error: error.message,
         canCancel: contractListService.canCancelContract(contract)

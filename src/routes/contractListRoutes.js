@@ -14,6 +14,7 @@ router.use(
 );
 
 router.get("/", contractListController.index);
+router.post("/:id/cancel", contractListController.cancel);
 router.get("/:id", contractListController.details);
 
 module.exports = router;

@@ -49,6 +49,7 @@ async function isDeviceAvailableForPeriod(deviceId, desiredStartDate, desiredRet
     JOIN Ugovor_o_najmu u
       ON su.ID_Ugovora = u.ID_Ugovora
     WHERE su.ID_Artikla = $1
+      AND u.Status NOT IN ('Otkazan od klijenta', 'Otkazan od distributera')
       AND u.Datum_Pocetka_Najma <= $3
       AND u.Ocekivani_Povrat >= $2
     `,
