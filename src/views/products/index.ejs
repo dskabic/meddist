@@ -1,93 +1,92 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Dostupni artikli</title>
-</head>
-<body>
-  <h1>Dostupni artikli</h1>
+<%- include("../partials/page-start", { pageTitle: "Dostupni artikli" }) %>
 
-  <p>
-    <a href="/client/dashboard">Natrag na dashboard</a>
-  </p>
+<main class="mx-auto max-w-7xl space-y-6">
+  <section class="rounded-3xl border border-white/10 bg-white/8 p-6 shadow-2xl shadow-slate-950/40 backdrop-blur-xl sm:p-8">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-sm font-medium uppercase tracking-[0.24em] text-cyan-200">Artikli</p>
+        <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Dostupni artikli</h1>
+        <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">Pregled svih dostupnih uređaja za najam i potrošnog materijala.</p>
+      </div>
 
-  <form method="GET" action="/client/products">
-    <input
-      type="text"
-      name="search"
-      placeholder="Pretraži po nazivu, proizvođaču, serijskom broju ili LOT broju"
-      value="<%= search %>"
-    >
+      <div class="flex gap-3">
+        <a href="/client/rental-requests/create" class="inline-flex items-center justify-center rounded-xl bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">Napravi zahtjev za najam</a>
+        <a href="/client/dashboard" class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Natrag na dashboard</a>
+      </div>
+    </div>
 
-    <button type="submit">Pretraži</button>
-    <a href="/client/products">Očisti</a>
-  </form>
+    <form method="GET" action="/client/products" class="mt-6 flex flex-col gap-3 sm:flex-row">
+      <input type="text" name="search" placeholder="Pretraži po nazivu, proizvođaču, serijskom broju ili LOT broju" value="<%= search %>" class="w-full flex-1 rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/60 focus:ring-2 focus:ring-cyan-400/20">
+      <div class="flex gap-3">
+        <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">Pretraži</button>
+        <a href="/client/products" class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Očisti</a>
+      </div>
+    </form>
+  </section>
+  
 
-  <br>
+  <section class="overflow-hidden rounded-3xl border border-white/10 bg-slate-950/60 shadow-2xl shadow-slate-950/40 backdrop-blur-xl">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-white/10 text-left text-sm">
+        <thead class="bg-white/5 text-slate-300">
+          <tr>
+            <th class="px-5 py-4 font-semibold">Naziv</th>
+            <th class="px-5 py-4 font-semibold">Proizvođač</th>
+            <th class="px-5 py-4 font-semibold">Vrsta</th>
+            <th class="px-5 py-4 font-semibold">Serijski broj</th>
+            <th class="px-5 py-4 font-semibold">Status</th>
+            <th class="px-5 py-4 font-semibold">Cijena najma/dan</th>
+            <th class="px-5 py-4 font-semibold">LOT broj</th>
+            <th class="px-5 py-4 font-semibold">Zaliha</th>
+            <th class="px-5 py-4 font-semibold">Jedinična cijena</th>
+          </tr>
+        </thead>
 
-  <table border="1" cellpadding="6">
-    <thead>
-      <tr>
-        <th>Naziv</th>
-        <th>Proizvođač</th>
-        <th>Vrsta</th>
-        <th>Serijski broj</th>
-        <th>Status</th>
-        <th>Cijena najma/dan</th>
-        <th>LOT broj</th>
-        <th>Zaliha</th>
-        <th>Jedinična cijena</th>
-      </tr>
-    </thead>
+        <tbody class="divide-y divide-white/10">
+          <% if (products.length === 0) { %>
+            <tr>
+              <td colspan="9" class="px-5 py-10 text-center text-slate-300">Nema dostupnih artikala.</td>
+            </tr>
+          <% } %>
 
-    <tbody>
-      <% if (products.length === 0) { %>
-        <tr>
-          <td colspan="9">Nema dostupnih artikala.</td>
-        </tr>
-      <% } %>
+          <% products.forEach(product => { %>
+            <tr class="bg-slate-950/40 align-top text-slate-100">
+              <td class="px-5 py-4 font-medium text-white"><%= product.name %></td>
+              <td class="px-5 py-4 text-slate-300"><%= product.manufacturer || "-" %></td>
 
-      <% products.forEach(product => { %>
-        <tr>
-          <td><%= product.name %></td>
-          <td><%= product.manufacturer || "-" %></td>
+              <td class="px-5 py-4 text-slate-300">
+                <% if (product.type === "UREDAJ") { %>
+                  Uređaj za najam
+                <% } else if (product.type === "POTROSNI_MATERIJAL") { %>
+                  Potrošni materijal
+                <% } else { %>
+                  Nepoznato
+                <% } %>
+              </td>
 
-          <td>
-            <% if (product.type === "UREDAJ") { %>
-              Uređaj za najam
-            <% } else if (product.type === "POTROSNI_MATERIJAL") { %>
-              Potrošni materijal
-            <% } else { %>
-              Nepoznato
-            <% } %>
-          </td>
+              <td class="px-5 py-4 text-slate-300"><%= product.serial_number || "-" %></td>
+              <td class="px-5 py-4 text-slate-300"><%= product.availability_status || "-" %></td>
 
-          <td><%= product.serial_number || "-" %></td>
-          <td><%= product.availability_status || "-" %></td>
+              <td class="px-5 py-4 text-slate-300">
+                <%= product.rental_price_per_day !== null ? product.rental_price_per_day : "-" %>
+              </td>
 
-          <td>
-            <%= product.rental_price_per_day !== null ? product.rental_price_per_day : "-" %>
-          </td>
+              <td class="px-5 py-4 text-slate-300"><%= product.lot_number || "-" %></td>
 
-          <td><%= product.lot_number || "-" %></td>
+              <td class="px-5 py-4 text-slate-300">
+                <%= product.current_stock !== null ? product.current_stock : "-" %>
+              </td>
 
-          <td>
-            <%= product.current_stock !== null ? product.current_stock : "-" %>
-          </td>
+              <td class="px-5 py-4 text-slate-300">
+                <%= product.unit_price !== null ? product.unit_price : "-" %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-          <td>
-            <%= product.unit_price !== null ? product.unit_price : "-" %>
-          </td>
-        </tr>
-      <% }) %>
-    </tbody>
-  </table>
+</main>
 
-  <br>
-
-  <p>
-    <a href="/client/rental-requests/create">
-      <button>Napravi zahtjev za najam</button>
-    </a>
-  </p>
-</body>
-</html>
+<%- include("../partials/page-end") %>
