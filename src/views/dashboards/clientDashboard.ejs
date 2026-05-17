@@ -1,53 +1,34 @@
 <%- include("../partials/page-start", { pageTitle: "Klijentski dashboard" }) %>
 
 <main class="mx-auto max-w-5xl">
-  <section class="rounded-3xl border border-white/10 bg-white/8 p-8 shadow-2xl shadow-slate-950/40 backdrop-blur-xl sm:p-10">
-    <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-      <div>
-        <span class="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
-          Klijent
-        </span>
+  <section class="app-panel p-8 sm:p-10">
+    <div>
+      <h1 class="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+        Klijentski dio aplikacije
+      </h1>
 
-        <h1 class="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-          Klijentski dio aplikacije
-        </h1>
-
-        <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-          Dobrodošli, <%= currentUser.name %>. Ovdje možete pregledati ključne klijentske mogućnosti sustava.
-        </p>
-      </div>
-
-      <form method="POST" action="/logout">
-        <button type="submit" class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/10">
-          Odjava
-        </button>
-      </form>
+      <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+        Dobrodošli, <%= currentUser.name %>. Ovdje možete pregledati ključne klijentske mogućnosti sustava.
+      </p>
     </div>
 
     <div class="mt-8 grid gap-4 md:grid-cols-3">
-      <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-6">
-        <h2 class="text-lg font-semibold text-white"><a href="/client/products">Pregled dostupnih artikala</a></h2>
+      <a href="/client/products" class="app-card block rounded-2xl border border-white/10 bg-slate-900/60 p-6 transition">
+        <h2 class="text-lg font-semibold text-white">Pregled dostupnih artikala</h2>
         <p class="mt-2 text-sm leading-6 text-slate-300">Pregled i pretraživanje dostupnih artikala za najam.</p>
-      </div>
-      <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-6">
-
-        <h2 class="text-lg font-semibold text-white"><a href="/client/rental-requests">Zahtjevi za najam</a></h2>
+      </a>
+      <a href="/client/rental-requests" class="app-card block rounded-2xl border border-white/10 bg-slate-900/60 p-6 transition">
+        <h2 class="text-lg font-semibold text-white">Zahtjevi za najam</h2>
         <p class="mt-2 text-sm leading-6 text-slate-300">Stvaranje zahtjeva za najam.</p>
-      </div>
-      <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-6">
-        <h2 class="text-lg font-semibold text-white"><a href="/client/contracts">Ugovori o najmu</a></h2>
+      </a>
+      <a href="/client/contracts" class="app-card block rounded-2xl border border-white/10 bg-slate-900/60 p-6 transition">
+        <h2 class="text-lg font-semibold text-white">Ugovori o najmu</h2>
         <p class="mt-2 text-sm leading-6 text-slate-300">Pregled sklopljenih ugovora i mogućnost otkazivanja prije početka najma.</p>
-      </div>
-       <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-6">
-        <h2 class="text-lg font-semibold text-white"><a href="/client/purchases">Kupnja potrošnog materijala</a></h2>
+      </a>
+      <a href="/client/purchases" class="app-card block rounded-2xl border border-white/10 bg-slate-900/60 p-6 transition">
+        <h2 class="text-lg font-semibold text-white">Kupnja potrošnog materijala</h2>
         <p class="mt-2 text-sm leading-6 text-slate-300">Košarica, slanje narudžbi i praćenje njihovog statusa.</p>
-      </div>
-
-      <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-6">
-        <h2 class="text-lg font-semibold text-white">Pregled aktivnosti</h2>
-        <p class="mt-2 text-sm leading-6 text-slate-300">Na jednom mjestu pratite i najmove i kupovne narudžbe.</p>
-      </div>
-
+      </a>
     </div>
 
   </section>
