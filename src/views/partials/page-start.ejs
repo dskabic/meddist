@@ -5,11 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof pageTitle !== "undefined" ? pageTitle : "SDMU" %></title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: #111827;
+      color: #e2e8f0;
+    }
+
+    .rounded-3xl { border-radius: 12px !important; }
+    .rounded-2xl { border-radius: 10px !important; }
+    .rounded-xl,
+    .rounded-lg { border-radius: 8px !important; }
+
+    .shadow-2xl,
+    .shadow-slate-950\/40 {
+      box-shadow: none !important;
+    }
+
+    .backdrop-blur-xl {
+      backdrop-filter: none !important;
+    }
+
+    .bg-white\/8,
+    .bg-white\/5,
+    .bg-slate-900\/60,
+    .bg-slate-950\/60 {
+      background-color: rgba(17, 24, 39, 0.92) !important;
+    }
+
+    .app-top-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(17, 24, 39, 0.92);
+      color: #e2e8f0;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .app-panel {
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      background: rgba(17, 24, 39, 0.92);
+    }
+
+    .app-button-primary {
+      background: #334155 !important;
+      color: #f8fafc !important;
+    }
+
+    .app-button-primary:hover {
+      background: #475569 !important;
+    }
+
+    .app-card:hover {
+      border-color: rgba(148, 163, 184, 0.3) !important;
+      background: rgba(30, 41, 59, 0.95) !important;
+    }
+  </style>
 </head>
 <body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
-  <div class="fixed inset-0 -z-10 overflow-hidden">
-    <div class="absolute -left-24 top-[-8rem] h-72 w-72 rounded-full bg-cyan-500/20 blur-3xl"></div>
-    <div class="absolute right-0 top-32 h-96 w-96 rounded-full bg-sky-500/10 blur-3xl"></div>
-    <div class="absolute bottom-0 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-indigo-500/10 blur-3xl"></div>
-  </div>
   <div class="relative mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <header class="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
+      <a href="<%= homeHref %>" class="app-top-link">Početna</a>
+      <% if (currentUser) { %>
+        <span class="text-sm text-slate-400"><%= currentUser.name %></span>
+      <% } %>
+    </header>

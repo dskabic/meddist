@@ -28,12 +28,45 @@ app.use(
   })
 );
 
+function resolveHomePath(user) {
+  if (!user) {
+    return "/";
+  }
+
+  if (user.type === "client") {
+    return "/client/dashboard";
+  }
+
+  if (user.role === "Djelatnik za narudžbe") {
+    return "/worker/orders";
+  }
+
+  if (user.role === "Djelatnik skladišta") {
+    return "/worker/warehouse";
+  }
+
+  if (user.role === "Servisni djelatnik") {
+    return "/worker/service";
+  }
+
+  if (user.role === "Administrator") {
+    return "/worker/admin";
+  }
+
+  return "/";
+}
+
 app.use((req, res, next) => {
   res.locals.currentUser = req.session.user || null;
+  res.locals.homeHref = resolveHomePath(req.session.user);
   next();
 });
 
 app.get("/", (req, res) => {
+  if (req.session.user) {
+    return res.redirect(resolveHomePath(req.session.user));
+  }
+
   res.render("home");
 });
 
