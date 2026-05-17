@@ -1,4 +1,4 @@
-<%- include("../partials/page-start", { pageTitle: `Detalji ugovora #${contract.id}` }) %>
+<%- include("../partials/page-start", { pageTitle: `Moj ugovor #${contract.id}` }) %>
 
 <main class="mx-auto max-w-5xl space-y-6">
   <section class="rounded-3xl border border-white/10 bg-white/8 p-6 shadow-2xl shadow-slate-950/40 backdrop-blur-xl sm:p-8">
@@ -6,11 +6,11 @@
       <div>
         <p class="text-sm font-medium uppercase tracking-[0.24em] text-cyan-200">Ugovor</p>
         <h1 class="mt-2 text-2xl font-semibold text-white">Detalji ugovora #<%= contract.id %></h1>
-        <p class="mt-1 text-sm text-slate-300">Zaglavlje ugovora i popis stavki</p>
+        <p class="mt-1 text-sm text-slate-300">Pregled zaglavlja ugovora i uređaja koji su uključeni u najam.</p>
       </div>
 
       <div class="hidden items-center gap-3 sm:flex">
-        <a href="/worker/orders/contracts" class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">Natrag na popis ugovora</a>
+        <a href="/client/contracts" class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">Natrag na moje ugovore</a>
       </div>
     </div>
   </section>
@@ -26,10 +26,10 @@
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 class="text-sm font-semibold text-slate-300">Otkazivanje ugovora</h3>
-          <p class="mt-1 text-sm text-slate-400">Ugovor se može otkazati dok najam još nije započeo.</p>
+          <p class="mt-1 text-sm text-slate-400">Ugovor možete otkazati dok najam još nije započeo.</p>
         </div>
 
-        <form method="POST" action="/worker/orders/contracts/<%= contract.id %>/cancel" onsubmit="return confirm('Jeste li sigurni da želite otkazati ovaj ugovor?');">
+        <form method="POST" action="/client/contracts/<%= contract.id %>/cancel" onsubmit="return confirm('Jeste li sigurni da želite otkazati ovaj ugovor?');">
           <button type="submit" class="inline-flex items-center justify-center rounded-xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/20">Otkaži ugovor</button>
         </form>
       </div>
@@ -57,7 +57,7 @@
           <dd class="mt-1 text-sm text-white"><%= contract.client_email %></dd>
         </div>
         <div>
-          <dt class="text-xs text-slate-400">Djelatnik</dt>
+          <dt class="text-xs text-slate-400">Djelatnik distributera</dt>
           <dd class="mt-1 text-sm text-white"><%= contract.worker_name %> (<%= contract.worker_role %>)</dd>
         </div>
         <div>
@@ -120,41 +120,6 @@
           </tbody>
         </table>
       </div>
-    </div>
-  </section>
-
-  <section class="rounded-2xl border border-white/8 bg-slate-950/50 p-5">
-    <h3 class="text-sm font-semibold text-slate-300">Izračun</h3>
-
-    <div class="mt-4">
-      <%
-        const start = contract.rental_start_date ? new Date(contract.rental_start_date) : null;
-        const end = new Date(contract.expected_return_date);
-        let days = null;
-
-        if (start) {
-          days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-        }
-
-        const dailyTotal = contract.items.reduce((sum, item) => {
-          return sum + Number(item.agreed_price_per_day);
-        }, 0);
-      %>
-
-      <dl class="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div class="rounded-lg bg-slate-900/40 p-3">
-          <dt class="text-xs text-slate-400">Dnevni ukupni iznos</dt>
-          <dd class="mt-1 text-sm font-medium text-white"><%= dailyTotal.toFixed(2) %> €</dd>
-        </div>
-        <div class="rounded-lg bg-slate-900/40 p-3">
-          <dt class="text-xs text-slate-400">Broj dana</dt>
-          <dd class="mt-1 text-sm font-medium text-white"><%= days !== null ? days : "-" %></dd>
-        </div>
-        <div class="rounded-lg bg-slate-900/40 p-3">
-          <dt class="text-xs text-slate-400">Ukupno procijenjeno</dt>
-          <dd class="mt-1 text-sm font-medium text-white"><%= days !== null ? (dailyTotal * days).toFixed(2) + " €" : "-" %></dd>
-        </div>
-      </dl>
     </div>
   </section>
 </main>
