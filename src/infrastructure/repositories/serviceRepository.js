@@ -6,6 +6,7 @@ async function findAll(search = "") {
     SELECT
       s.ID_Servisa AS id,
       s.Datum_Izdavanja AS service_date,
+      s.Datum_Zavrsetka AS finished_date,
       s.Opis_Radova AS description,
       s.ID_Artikla AS equipment_id,
 
@@ -15,7 +16,7 @@ async function findAll(search = "") {
       u.Serijski_Broj AS serial_number,
       u.Status_Raspolozivosti AS availability_status,
       CASE
-        WHEN u.Status_Raspolozivosti = 'Na servisu' THEN 'U tijeku'
+        WHEN s.Datum_Zavrsetka IS NULL THEN 'U tijeku'
         ELSE 'Završen'
       END AS service_status
 
@@ -43,6 +44,7 @@ async function findById(id) {
     SELECT
       s.ID_Servisa AS id,
       s.Datum_Izdavanja AS service_date,
+      s.Datum_Zavrsetka AS finished_date,
       s.Opis_Radova AS description,
       s.ID_Artikla AS equipment_id,
 
@@ -52,7 +54,7 @@ async function findById(id) {
       u.Serijski_Broj AS serial_number,
       u.Status_Raspolozivosti AS availability_status,
       CASE
-        WHEN u.Status_Raspolozivosti = 'Na servisu' THEN 'U tijeku'
+        WHEN s.Datum_Zavrsetka IS NULL THEN 'U tijeku'
         ELSE 'Završen'
       END AS service_status
 
@@ -114,6 +116,25 @@ async function findDeviceById(equipmentId) {
   return result.rows[0] || null;
 }
 
+async function findOpenServiceByEquipmentId(equipmentId, excludedServiceId = null) {
+  const result = await pool.query(
+    `
+    SELECT
+      ID_Servisa AS id,
+      ID_Artikla AS equipment_id
+    FROM Servis
+    WHERE ID_Artikla = $1
+      AND Datum_Zavrsetka IS NULL
+      AND ($2::int IS NULL OR ID_Servisa <> $2)
+    ORDER BY ID_Servisa DESC
+    LIMIT 1
+    `,
+    [equipmentId, excludedServiceId]
+  );
+
+  return result.rows[0] || null;
+}
+
 async function create(serviceRecord) {
   const client = await pool.connect();
 
@@ -123,8 +144,8 @@ async function create(serviceRecord) {
     const result = await client.query(
       `
       INSERT INTO Servis
-      (Datum_Izdavanja, Opis_Radova, ID_Artikla)
-      VALUES ($1, $2, $3)
+      (Datum_Izdavanja, Datum_Zavrsetka, Opis_Radova, ID_Artikla)
+      VALUES ($1, NULL, $2, $3)
       RETURNING ID_Servisa
       `,
       [
@@ -190,20 +211,72 @@ async function remove(id) {
 }
 
 async function finishService(id) {
-  const service = await findById(id);
+  const client = await pool.connect();
 
-  if (!service) {
-    throw new Error("Servis nije pronađen.");
+  try {
+    await client.query("BEGIN");
+
+    const serviceResult = await client.query(
+      `
+      SELECT
+        ID_Servisa AS id,
+        ID_Artikla AS equipment_id,
+        Datum_Izdavanja AS service_date,
+        Datum_Zavrsetka AS finished_date
+      FROM Servis
+      WHERE ID_Servisa = $1
+      FOR UPDATE
+      `,
+      [id]
+    );
+
+    const service = serviceResult.rows[0];
+
+    if (!service) {
+      throw new Error("Servis nije pronađen.");
+    }
+
+    if (service.finished_date) {
+      throw new Error("Servis je već završen.");
+    }
+
+    await client.query(
+      `
+      UPDATE Servis
+      SET Datum_Zavrsetka = GREATEST(CURRENT_DATE, Datum_Izdavanja)
+      WHERE ID_Servisa = $1
+      `,
+      [id]
+    );
+
+    const openServicesResult = await client.query(
+      `
+      SELECT COUNT(*) AS open_count
+      FROM Servis
+      WHERE ID_Artikla = $1
+        AND Datum_Zavrsetka IS NULL
+      `,
+      [service.equipment_id]
+    );
+
+    if (Number(openServicesResult.rows[0].open_count) === 0) {
+      await client.query(
+        `
+        UPDATE Uredaj
+        SET Status_Raspolozivosti = 'Dostupan'
+        WHERE ID_Artikla = $1
+        `,
+        [service.equipment_id]
+      );
+    }
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
   }
-
-  await pool.query(
-    `
-    UPDATE Uredaj
-    SET Status_Raspolozivosti = 'Dostupan'
-    WHERE ID_Artikla = $1
-    `,
-    [service.equipment_id]
-  );
 }
 
 module.exports = {
@@ -211,6 +284,7 @@ module.exports = {
   findById,
   findAvailableDevices,
   findDeviceById,
+  findOpenServiceByEquipmentId,
   create,
   update,
   remove,

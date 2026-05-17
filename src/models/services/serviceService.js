@@ -56,6 +56,18 @@ async function createServiceRecord(formData) {
     throw error;
   }
 
+  const openService = await serviceRepository.findOpenServiceByEquipmentId(
+    serviceRecord.equipmentId
+  );
+
+  if (openService) {
+    const error = new Error("Za uređaj već postoji aktivni servis.");
+    error.validationErrors = [
+      "Za odabrani uređaj već postoji servis koji još nije završen."
+    ];
+    throw error;
+  }
+
   return serviceRepository.create(serviceRecord);
 }
 
@@ -78,6 +90,19 @@ async function updateServiceRecord(id, formData) {
   if (!device) {
     const error = new Error("Odabrani uređaj ne postoji.");
     error.validationErrors = ["Odabrani uređaj ne postoji."];
+    throw error;
+  }
+
+  const openService = await serviceRepository.findOpenServiceByEquipmentId(
+    serviceRecord.equipmentId,
+    Number(id)
+  );
+
+  if (openService) {
+    const error = new Error("Za uređaj već postoji aktivni servis.");
+    error.validationErrors = [
+      "Za odabrani uređaj već postoji servis koji još nije završen."
+    ];
     throw error;
   }
 
